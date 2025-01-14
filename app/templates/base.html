@@ -8,5 +8,38 @@
 </head>
 <body>
     {% block content %}{% endblock %}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click handlers for help icons
+        document.querySelectorAll('.help-icon').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Close any other open help texts
+                document.querySelectorAll('.help-text.active').forEach(help => {
+                    if (help.id !== `help-${this.dataset.help}`) {
+                        help.classList.remove('active');
+                    }
+                });
+                
+                // Toggle the clicked help text
+                const helpText = document.getElementById(`help-${this.dataset.help}`);
+                if (helpText) {
+                    helpText.classList.toggle('active');
+                }
+            });
+        });
+
+        // Close help text when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('.help-icon') && !e.target.closest('.help-text')) {
+                document.querySelectorAll('.help-text.active').forEach(help => {
+                    help.classList.remove('active');
+                });
+            }
+        });
+    });
+    </script>
 </body>
 </html> 
