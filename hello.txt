@@ -1,1 +1,99 @@
-hello
+To get a complete and thorough execution of a request, it's best to format your request with clear specifications and expectations. Here's how you could structure requests:
+
+Clear Action with Scope:
+Task: Add help text for all form attributes
+Scope: All attributes in EC2, RDS, and S3 forms
+Requirements:
+- Every input field must have a help icon and help text
+- No attribute should be left without help
+- Include format: <attribute> <help-icon> + help text with examples
+
+
+With Specific Sections:
+
+Complete the following tasks in order:
+1. EC2 Form
+   - Basic Configuration section
+   - Network Configuration section
+   - Storage Configuration section
+   - Advanced Options section
+
+2. RDS Form
+   - Basic Configuration section
+   - Storage Configuration section
+   - Network & Security section
+   - Authentication section
+   - Backup & Maintenance section
+
+3. S3 Form
+   - Basic Configuration section
+   - Versioning & Encryption section
+   - Lifecycle Rules section
+   - Cross-Region Replication section
+
+
+With Validation Requirements:
+Task: Add comprehensive help text
+Validation Criteria:
+1. Every form input must have:
+   - Help icon (?)
+   - Detailed description
+   - Example values
+   - Best practices
+   - Common use cases
+
+2. Check that no attribute is missing:
+   - Compare against AWS documentation
+   - Ensure all form fields have corresponding help
+   - Verify help text is complete
+
+With Progress Tracking:
+Request: Complete help text implementation
+Progress Tracking:
+- Confirm each section completion
+- List any skipped attributes
+- Request explicit confirmation when complete
+- Ask for review of remaining sections
+
+Example of a complete request:
+
+Please implement comprehensive help text for all form attributes with the following requirements:
+
+1. Coverage:
+   - All EC2, RDS, and S3 form fields
+   - No exceptions or omissions
+
+2. Help Text Format:
+   - Title and description
+   - Detailed explanation
+   - Configuration examples
+   - Best practices
+   - Common pitfalls
+
+3. Implementation:
+   - Add help-icon span
+   - Add help-text div
+   - Include all specified content
+
+
+
+   Updated the Terraform templates:
+Enhanced EC2 template with comprehensive configurations
+Updated RDS template with all necessary settings
+Updated S3 template with complete bucket configurations
+Added detailed help text for form attributes:
+EC2 instance configurations
+RDS database settings
+S3 bucket properties
+Improved template organization with:
+Clear section comments
+Conditional configurations
+Best practices implementation
+Security features
+Monitoring and alarms
+Comprehensive outputs
+Would you like to:
+Review any specific part of the implementation?
+Test the current implementation?
+Add documentation?
+Make any adjustments to the existing code?

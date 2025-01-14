@@ -1,0 +1,20 @@
+terraform-generator/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── resources/
+│   │   ├── __init__.py
+│   │   ├── ec2.py
+│   │   ├── rds.py
+│   │   └── s3.py
+│   ├── static/
+│   │   └── css/
+│   │       └── style.css
+│   └── templates/
+│       ├── base.html
+│       ├── index.html
+│       └── terraform/
+│           ├── ec2.tf.j2
+│           ├── rds.tf.j2
+│           └── s3.tf.j2
+└── requirements.txt 

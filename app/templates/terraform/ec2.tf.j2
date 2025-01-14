@@ -1,0 +1,107 @@
+# AWS Provider configuration is assumed to be defined elsewhere
+
+# EC2 Instance Resource
+resource "aws_instance" "{{ name }}" {
+  # Basic Configuration
+  ami           = "{{ ami_id }}"
+  instance_type = "{{ instance_type }}"
+  
+  # Network Configuration
+  {% if vpc_id %}
+  vpc_id = "{{ vpc_id }}"
+  {% endif %}
+  {% if subnet_id %}
+  subnet_id = "{{ subnet_id }}"
+  {% endif %}
+  {% if vpc_security_group_ids %}
+  vpc_security_group_ids = [{% for sg in vpc_security_group_ids.split(',') %}"{{ sg.strip() }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+  {% endif %}
+  {% if associate_public_ip_address %}
+  associate_public_ip_address = true
+  {% endif %}
+
+  # Storage Configuration
+  root_block_device {
+    volume_type = "{{ root_volume_type }}"
+    volume_size = {{ root_volume_size | default(8) }}
+    {% if root_volume_type in ['io1', 'io2'] and iops is defined %}
+    iops        = {{ iops }}
+    {% endif %}
+    encrypted   = true
+    tags = {
+      Name = "{{ name }}-root-volume"
+    }
+  }
+
+  # Tags
+  tags = {
+    Name = "{{ name }}"
+    {% if tags %}
+    {% for key, value in tags.items() %}
+    {{ key }} = "{{ value }}"
+    {% endfor %}
+    {% endif %}
+  }
+}
+
+# CloudWatch Alarms (Optional)
+{% if create_alarms | default(false) %}
+resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
+  alarm_name          = "{{ name }}-cpu-utilization"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace          = "AWS/EC2"
+  period             = "300"
+  statistic          = "Average"
+  threshold          = "80"
+  alarm_description  = "CPU utilization for {{ name }}"
+
+  dimensions = {
+    InstanceId = aws_instance.{{ name }}.id
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "status_check" {
+  alarm_name          = "{{ name }}-status-check"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "StatusCheckFailed"
+  namespace          = "AWS/EC2"
+  period             = "300"
+  statistic          = "Maximum"
+  threshold          = "0"
+  alarm_description  = "Status check for {{ name }}"
+
+  dimensions = {
+    InstanceId = aws_instance.{{ name }}.id
+  }
+}
+{% endif %}
+
+# Outputs
+output "instance_id" {
+  value = aws_instance.{{ name }}.id
+}
+
+output "private_ip" {
+  value = aws_instance.{{ name }}.private_ip
+}
+
+{% if associate_public_ip_address %}
+output "public_ip" {
+  value = aws_instance.{{ name }}.public_ip
+}
+
+output "public_dns" {
+  value = aws_instance.{{ name }}.public_dns
+}
+{% endif %}
+
+output "instance_state" {
+  value = aws_instance.{{ name }}.instance_state
+}
+
+output "availability_zone" {
+  value = aws_instance.{{ name }}.availability_zone
+} 

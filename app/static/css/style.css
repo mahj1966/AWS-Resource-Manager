@@ -1,0 +1,36 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.resource-form {
+    margin-top: 20px;
+}
+
+.form-field {
+    margin-bottom: 15px;
+}
+
+.help-icon {
+    cursor: pointer;
+    color: #0066cc;
+    margin-left: 5px;
+}
+
+.help-text {
+    display: none;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    margin-top: 5px;
+    border-radius: 4px;
+}
+
+.example {
+    margin-top: 10px;
+    padding: 10px;
+    background: #e9ecef;
+    border-radius: 4px;
+    font-family: monospace;
+} 

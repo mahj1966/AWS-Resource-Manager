@@ -1,0 +1,779 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Terraform Configuration Generator</h1>
+    
+    <div class="resource-selector">
+        <label for="resource-type">Select Resource Type:</label>
+        <select id="resource-type">
+            <option value="ec2">EC2 Instance</option>
+            <option value="rds">RDS Database</option>
+            <option value="s3">S3 Bucket</option>
+        </select>
+    </div>
+
+    <div class="resource-forms">
+        <!-- EC2 Instance Form -->
+        <div id="ec2-form" class="resource-form">
+            <h2>EC2 Configuration</h2>
+            <form id="ec2-config">
+                <h3>Basic Configuration</h3>
+                <div class="form-field">
+                    <label for="ec2-name">Instance Name <span class="help-icon" data-help="name">?</span></label>
+                    <input type="text" id="ec2-name" name="name" required>
+                    <div class="help-text" id="help-name">
+                        <h4>Instance Name</h4>
+                        <p>A unique identifier for your EC2 instance.</p>
+                        <ul>
+                            <li>Used as the Name tag for the instance</li>
+                            <li>Makes it easier to identify the instance in the AWS Console</li>
+                            <li>Can contain letters, numbers, and hyphens</li>
+                            <li>Best practice: Use a naming convention like: {environment}-{purpose}-{number}</li>
+                        </ul>
+                        <div class="example">Example: prod-web-01</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-type">Instance Type <span class="help-icon" data-help="instance-type">?</span></label>
+                    <select id="ec2-type" name="instance_type" required>
+                        <optgroup label="General Purpose - T3">
+                            <option value="t3.micro">t3.micro (2 vCPU, 1 GiB RAM)</option>
+                            <option value="t3.small">t3.small (2 vCPU, 2 GiB RAM)</option>
+                            <option value="t3.medium">t3.medium (2 vCPU, 4 GiB RAM)</option>
+                        </optgroup>
+                        <optgroup label="Compute Optimized - C5">
+                            <option value="c5.large">c5.large (2 vCPU, 4 GiB RAM)</option>
+                            <option value="c5.xlarge">c5.xlarge (4 vCPU, 8 GiB RAM)</option>
+                        </optgroup>
+                        <optgroup label="Memory Optimized - R5">
+                            <option value="r5.large">r5.large (2 vCPU, 16 GiB RAM)</option>
+                            <option value="r5.xlarge">r5.xlarge (4 vCPU, 32 GiB RAM)</option>
+                        </optgroup>
+                    </select>
+                    <div class="help-text" id="help-instance-type">
+                        <h4>Instance Type</h4>
+                        <p>Hardware configuration for your instance.</p>
+                        <ul>
+                            <li><strong>T3 Series (General Purpose):</strong>
+                                <ul>
+                                    <li>Burstable performance</li>
+                                    <li>Ideal for websites and development</li>
+                                    <li>t3.micro is free tier eligible</li>
+                                </ul>
+                            </li>
+                            <li><strong>C5 Series (Compute Optimized):</strong>
+                                <ul>
+                                    <li>High performance processors</li>
+                                    <li>Ideal for batch processing and high-traffic web servers</li>
+                                </ul>
+                            </li>
+                            <li><strong>R5 Series (Memory Optimized):</strong>
+                                <ul>
+                                    <li>High memory to CPU ratio</li>
+                                    <li>Ideal for in-memory databases and caching</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-ami">AMI ID <span class="help-icon" data-help="ami">?</span></label>
+                    <select id="ec2-ami" name="ami_id" required>
+                        <optgroup label="Amazon Linux 2">
+                            <option value="ami-0cff7528ff583bf9a">Amazon Linux 2 (x86_64)</option>
+                            <option value="ami-0d1a4d3aa8dec0a79">Amazon Linux 2 (ARM64)</option>
+                        </optgroup>
+                        <optgroup label="Ubuntu">
+                            <option value="ami-0261755bbcb8c4a84">Ubuntu 22.04 LTS</option>
+                            <option value="ami-0149b2da6ceec4bb0">Ubuntu 20.04 LTS</option>
+                        </optgroup>
+                    </select>
+                    <div class="help-text" id="help-ami">
+                        <h4>Amazon Machine Image (AMI)</h4>
+                        <p>Base image for your instance.</p>
+                        <ul>
+                            <li><strong>Amazon Linux 2:</strong>
+                                <ul>
+                                    <li>AWS-optimized Linux distribution</li>
+                                    <li>Includes AWS CLI and tools</li>
+                                    <li>Regular security updates</li>
+                                </ul>
+                            </li>
+                            <li><strong>Ubuntu LTS:</strong>
+                                <ul>
+                                    <li>Long Term Support versions</li>
+                                    <li>Wide community support</li>
+                                    <li>Extensive package repository</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Network Configuration</h3>
+                <div class="form-field">
+                    <label for="ec2-vpc">VPC ID <span class="help-icon" data-help="vpc">?</span></label>
+                    <input type="text" id="ec2-vpc" name="vpc_id" required>
+                    <div class="help-text" id="help-vpc">
+                        <h4>Virtual Private Cloud (VPC)</h4>
+                        <p>The ID of the VPC where the instance will be launched.</p>
+                        <ul>
+                            <li><strong>Format:</strong>
+                                <ul>
+                                    <li>Starts with 'vpc-'</li>
+                                    <li>Followed by 8 or 17 characters</li>
+                                    <li>Example: vpc-0123abcd or vpc-0123abcd4567efgh</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use private VPCs</li>
+                                    <li>Ensure proper CIDR range</li>
+                                    <li>Consider network isolation</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Using default VPC</li>
+                                    <li>Insufficient IP addresses</li>
+                                    <li>Incorrect routing setup</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: vpc-0a1b2c3d4e</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-subnet">Subnet ID <span class="help-icon" data-help="subnet">?</span></label>
+                    <input type="text" id="ec2-subnet" name="subnet_id" required>
+                    <div class="help-text" id="help-subnet">
+                        <h4>Subnet</h4>
+                        <p>The ID of the subnet where the instance will be launched.</p>
+                        <ul>
+                            <li><strong>Format:</strong>
+                                <ul>
+                                    <li>Starts with 'subnet-'</li>
+                                    <li>Followed by 8 or 17 characters</li>
+                                    <li>Example: subnet-0123abcd or subnet-0123abcd4567efgh</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use private subnets for applications</li>
+                                    <li>Consider availability zone</li>
+                                    <li>Plan IP address space</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Using public subnets unnecessarily</li>
+                                    <li>Not considering AZ redundancy</li>
+                                    <li>Insufficient IP addresses</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: subnet-0a1b2c3d4e</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-sg">Security Group IDs <span class="help-icon" data-help="security-groups">?</span></label>
+                    <input type="text" id="ec2-sg" name="vpc_security_group_ids">
+                    <div class="help-text" id="help-security-groups">
+                        <h4>Security Groups</h4>
+                        <p>The security group IDs that control network access to the instance.</p>
+                        <ul>
+                            <li><strong>Format:</strong>
+                                <ul>
+                                    <li>Starts with 'sg-'</li>
+                                    <li>Followed by 8 or 17 characters</li>
+                                    <li>Multiple IDs separated by commas</li>
+                                    <li>Example: sg-0123abcd,sg-4567efgh</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use separate groups for different purposes</li>
+                                    <li>Follow principle of least privilege</li>
+                                    <li>Document group purposes</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Using overly permissive rules</li>
+                                    <li>Forgetting to allow return traffic</li>
+                                    <li>Not reviewing rules regularly</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: sg-0a1b2c3d4e,sg-5f6g7h8i9j</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-public-ip">Associate Public IP <span class="help-icon" data-help="public-ip">?</span></label>
+                    <input type="checkbox" id="ec2-public-ip" name="associate_public_ip_address">
+                    <div class="help-text" id="help-public-ip">
+                        <h4>Public IP Association</h4>
+                        <p>Determines whether the instance receives a public IP address.</p>
+                        <ul>
+                            <li><strong>Requirements:</strong>
+                                <ul>
+                                    <li>Instance must be in a public subnet</li>
+                                    <li>Internet Gateway must be attached to VPC</li>
+                                    <li>Route table must route to IGW</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use private IPs for internal services</li>
+                                    <li>Use public IPs only when necessary</li>
+                                    <li>Consider using bastion hosts</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Exposing instances unnecessarily</li>
+                                    <li>Not considering security groups</li>
+                                    <li>Forgetting about NAT requirements</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: true (for public-facing web servers)</div>
+                    </div>
+                </div>
+
+                <h3>Storage Configuration</h3>
+                <div class="form-field">
+                    <label for="ec2-volume-type">Root Volume Type <span class="help-icon" data-help="volume-type">?</span></label>
+                    <select id="ec2-volume-type" name="root_volume_type">
+                        <option value="gp3">General Purpose SSD (gp3)</option>
+                        <option value="gp2">General Purpose SSD (gp2)</option>
+                        <option value="io2">Provisioned IOPS SSD (io2)</option>
+                        <option value="io1">Provisioned IOPS SSD (io1)</option>
+                    </select>
+                    <div class="help-text" id="help-volume-type">
+                        <h4>EBS Volume Type</h4>
+                        <p>The type of EBS volume that determines performance characteristics.</p>
+                        <ul>
+                            <li><strong>General Purpose SSD (gp3):</strong>
+                                <ul>
+                                    <li>Baseline: 3,000 IOPS</li>
+                                    <li>125 MB/s throughput</li>
+                                    <li>Cost-effective for most workloads</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use gp3 for most applications</li>
+                                    <li>Monitor IOPS utilization</li>
+                                    <li>Consider cost vs performance</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Over-provisioning IOPS</li>
+                                    <li>Using io1/io2 unnecessarily</li>
+                                    <li>Not monitoring performance</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: gp3 (recommended for most use cases)</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-volume-size">Root Volume Size (GB) <span class="help-icon" data-help="volume-size">?</span></label>
+                    <input type="number" id="ec2-volume-size" name="root_volume_size" value="8">
+                    <div class="help-text" id="help-volume-size">
+                        <h4>Root Volume Size</h4>
+                        <p>The size of the root EBS volume in gigabytes.</p>
+                        <ul>
+                            <li><strong>Limits:</strong>
+                                <ul>
+                                    <li>Minimum: 8 GB (most AMIs)</li>
+                                    <li>Maximum: 16384 GB (16 TB)</li>
+                                    <li>Can be increased later</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Plan for future growth</li>
+                                    <li>Consider workload requirements</li>
+                                    <li>Monitor usage patterns</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Undersizing root volume</li>
+                                    <li>Not monitoring disk usage</li>
+                                    <li>Ignoring cost implications</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: 20 (for typical web server)</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-iops">IOPS <span class="help-icon" data-help="iops">?</span></label>
+                    <input type="number" id="ec2-iops" name="iops" placeholder="IOPS (for io1/io2 volumes)">
+                    <div class="help-text" id="help-iops">
+                        <h4>Provisioned IOPS</h4>
+                        <p>The number of I/O operations per second (IOPS) to provision for io1/io2 volumes.</p>
+                        <ul>
+                            <li><strong>Limits:</strong>
+                                <ul>
+                                    <li>io1: 100-64,000 IOPS</li>
+                                    <li>io2: 100-256,000 IOPS</li>
+                                    <li>Max ratio: 50 IOPS/GB</li>
+                                    <li>Min ratio: 0.5 IOPS/GB</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Match application requirements</li>
+                                    <li>Monitor IOPS utilization</li>
+                                    <li>Consider cost implications</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Over-provisioning IOPS</li>
+                                    <li>Not considering volume size ratio</li>
+                                    <li>Ignoring baseline performance</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: 3000 (for database workloads)</div>
+                    </div>
+                </div>
+
+                <h3>Advanced Options</h3>
+                <div class="form-field">
+                    <label for="ec2-iam-profile">IAM Instance Profile <span class="help-icon" data-help="iam-profile">?</span></label>
+                    <input type="text" id="ec2-iam-profile" name="iam_instance_profile" placeholder="IAM Instance Profile">
+                    <div class="help-text" id="help-iam-profile">
+                        <h4>IAM Instance Profile</h4>
+                        <p>The IAM role that will be attached to the instance to grant AWS service permissions.</p>
+                        <ul>
+                            <li><strong>Format:</strong>
+                                <ul>
+                                    <li>Full ARN or profile name</li>
+                                    <li>ARN format: arn:aws:iam::account-id:instance-profile/profile-name</li>
+                                    <li>Or simple name: profile-name</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use principle of least privilege</li>
+                                    <li>Create role per application</li>
+                                    <li>Regularly review permissions</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Over-permissive roles</li>
+                                    <li>Using root/admin credentials</li>
+                                    <li>Not rotating credentials</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: MyAppInstanceProfile or arn:aws:iam::123456789012:instance-profile/MyAppInstanceProfile</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-key-pair">SSH Key Pair <span class="help-icon" data-help="key-pair">?</span></label>
+                    <input type="text" id="ec2-key-pair" name="key_name" placeholder="SSH Key Pair Name">
+                    <div class="help-text" id="help-key-pair">
+                        <h4>SSH Key Pair</h4>
+                        <p>The name of the key pair used for SSH access to the instance.</p>
+                        <ul>
+                            <li><strong>Requirements:</strong>
+                                <ul>
+                                    <li>Must exist in the same region</li>
+                                    <li>Case-sensitive name</li>
+                                    <li>Cannot be modified after launch</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use unique keys per environment</li>
+                                    <li>Rotate keys regularly</li>
+                                    <li>Secure private key storage</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Sharing key pairs</li>
+                                    <li>Losing private keys</li>
+                                    <li>Not documenting key usage</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: my-app-prod-key</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-monitoring">Monitoring <span class="help-icon" data-help="monitoring">?</span></label>
+                    <select id="ec2-monitoring" name="monitoring">
+                        <option value="false">Basic Monitoring</option>
+                        <option value="true">Detailed Monitoring</option>
+                    </select>
+                    <div class="help-text" id="help-monitoring">
+                        <h4>CloudWatch Monitoring</h4>
+                        <p>Determines the frequency of metric collection for the instance.</p>
+                        <ul>
+                            <li><strong>Options:</strong>
+                                <ul>
+                                    <li>Basic: 5-minute intervals (free)</li>
+                                    <li>Detailed: 1-minute intervals (additional cost)</li>
+                                    <li>Both include CPU, disk, network metrics</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use detailed for production critical</li>
+                                    <li>Set up appropriate alarms</li>
+                                    <li>Monitor costs regularly</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Over-monitoring non-critical resources</li>
+                                    <li>Not setting up alerts</li>
+                                    <li>Ignoring cost implications</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: true (for production workloads)</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="ec2-user-data">User Data Script <span class="help-icon" data-help="user-data">?</span></label>
+                    <textarea id="ec2-user-data" name="user_data" placeholder="User Data Script"></textarea>
+                    <div class="help-text" id="help-user-data">
+                        <h4>User Data Script</h4>
+                        <p>Shell script or cloud-init directives that run when the instance first launches.</p>
+                        <ul>
+                            <li><strong>Format:</strong>
+                                <ul>
+                                    <li>Shell script starting with #!/bin/bash</li>
+                                    <li>Cloud-init directives starting with #cloud-config</li>
+                                    <li>Maximum size: 16 KB</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Keep scripts idempotent</li>
+                                    <li>Include error handling</li>
+                                    <li>Log script execution</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Not testing scripts</li>
+                                    <li>Missing error handling</li>
+                                    <li>Exceeding size limit</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: #!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- RDS Instance Form -->
+        <div id="rds-form" class="resource-form" style="display: none;">
+            <h2>RDS Configuration</h2>
+            <form id="rds-config">
+                <h3>Basic Configuration</h3>
+                <div class="form-field">
+                    <label for="rds-name">Database Name <span class="help-icon" data-help="db-name">?</span></label>
+                    <input type="text" id="rds-name" name="database_name" required>
+                    <div class="help-text" id="help-db-name">
+                        <h4>Database Name</h4>
+                        <p>The name of the initial database to be created.</p>
+                        <ul>
+                            <li><strong>Requirements:</strong>
+                                <ul>
+                                    <li>1-63 characters long</li>
+                                    <li>Start with a letter</li>
+                                    <li>Only alphanumeric characters</li>
+                                    <li>Case-sensitive</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Use lowercase letters</li>
+                                    <li>Avoid special characters</li>
+                                    <li>Use meaningful names</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Using reserved words</li>
+                                    <li>Using hyphens or spaces</li>
+                                    <li>Starting with numbers</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: myappdb</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="rds-engine">Database Engine <span class="help-icon" data-help="db-engine">?</span></label>
+                    <select id="rds-engine" name="engine" required>
+                        <option value="mysql">MySQL</option>
+                        <option value="postgres">PostgreSQL</option>
+                        <option value="mariadb">MariaDB</option>
+                        <option value="oracle-ee">Oracle</option>
+                        <option value="sqlserver-ee">SQL Server</option>
+                    </select>
+                    <div class="help-text" id="help-db-engine">
+                        <h4>Database Engine</h4>
+                        <p>The database management system to be used.</p>
+                        <ul>
+                            <li><strong>MySQL:</strong>
+                                <ul>
+                                    <li>Most popular open-source database</li>
+                                    <li>Best for: Web applications, OLTP</li>
+                                    <li>Free licensing</li>
+                                </ul>
+                            </li>
+                            <li><strong>PostgreSQL:</strong>
+                                <ul>
+                                    <li>Advanced open-source database</li>
+                                    <li>Best for: Complex queries, GIS</li>
+                                    <li>Strong data integrity</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Not considering version compatibility</li>
+                                    <li>Overlooking licensing costs</li>
+                                    <li>Ignoring feature requirements</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: mysql</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="rds-identifier">DB Identifier <span class="help-icon" data-help="db-identifier">?</span></label>
+                    <input type="text" id="rds-identifier" name="identifier" placeholder="DB Identifier" required>
+                    <div class="help-text" id="help-db-identifier">
+                        <h4>Database Identifier</h4>
+                        <p>A unique identifier for your RDS instance within the AWS region.</p>
+                        <ul>
+                            <li><strong>Format Requirements:</strong>
+                                <ul>
+                                    <li>1-63 alphanumeric characters or hyphens</li>
+                                    <li>Must start with a letter</li>
+                                    <li>Cannot end with hyphen</li>
+                                    <li>Cannot contain consecutive hyphens</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Include environment (prod/dev)</li>
+                                    <li>Include application name</li>
+                                    <li>Include database engine</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Using special characters</li>
+                                    <li>Not following naming convention</li>
+                                    <li>Using AWS reserved terms</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: prod-myapp-postgres-01</div>
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label for="rds-instance-class">Instance Class <span class="help-icon" data-help="instance-class">?</span></label>
+                    <select id="rds-instance-class" name="instance_class" required>
+                        <optgroup label="Burstable Performance">
+                            <option value="db.t3.micro">db.t3.micro (1 vCPU, 1 GiB RAM)</option>
+                            <option value="db.t3.small">db.t3.small (2 vCPU, 2 GiB RAM)</option>
+                            <option value="db.t3.medium">db.t3.medium (2 vCPU, 4 GiB RAM)</option>
+                        </optgroup>
+                        <optgroup label="Memory Optimized">
+                            <option value="db.r5.large">db.r5.large (2 vCPU, 16 GiB RAM)</option>
+                            <option value="db.r5.xlarge">db.r5.xlarge (4 vCPU, 32 GiB RAM)</option>
+                        </optgroup>
+                    </select>
+                    <div class="help-text" id="help-instance-class">
+                        <h4>DB Instance Class</h4>
+                        <p>The compute and memory capacity of the database instance.</p>
+                        <ul>
+                            <li><strong>T3 Series (Burstable):</strong>
+                                <ul>
+                                    <li>Cost-effective for development</li>
+                                    <li>Variable workloads</li>
+                                    <li>CPU credits system</li>
+                                </ul>
+                            </li>
+                            <li><strong>Best Practices:</strong>
+                                <ul>
+                                    <li>Match workload requirements</li>
+                                    <li>Monitor CPU credit balance</li>
+                                    <li>Plan for scaling</li>
+                                </ul>
+                            </li>
+                            <li><strong>Common Pitfalls:</strong>
+                                <ul>
+                                    <li>Undersizing for workload</li>
+                                    <li>Ignoring CPU credits</li>
+                                    <li>Over-provisioning in dev</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="example">Example: db.t3.medium (development), db.r5.large (production)</div>
+                    </div>
+                </div>
+
+                <h3>Storage Configuration</h3>
+                <input type="number" name="allocated_storage" placeholder="Allocated Storage (GB)" value="20">
+                <select name="storage_type">
+                    <option value="gp2">General Purpose SSD (gp2)</option>
+                    <option value="gp3">General Purpose SSD (gp3)</option>
+                    <option value="io1">Provisioned IOPS SSD (io1)</option>
+                </select>
+                <input type="number" name="iops" placeholder="IOPS (for io1 storage type)">
+
+                <h3>Network & Security</h3>
+                <input type="text" name="vpc_security_group_ids" placeholder="Security Group IDs (comma-separated)">
+                <input type="text" name="db_subnet_group_name" placeholder="DB Subnet Group Name">
+                <label>
+                    <input type="checkbox" name="publicly_accessible"> Publicly Accessible
+                </label>
+
+                <h3>Authentication</h3>
+                <input type="text" name="username" placeholder="Master Username" required>
+                <input type="password" name="password" placeholder="Master Password" required>
+                <input type="text" name="port" placeholder="Port Number">
+
+                <h3>Backup & Maintenance</h3>
+                <input type="number" name="backup_retention_period" placeholder="Backup Retention Period (days)" value="7">
+                <input type="text" name="backup_window" placeholder="Backup Window (e.g., 03:00-04:00)">
+                <input type="text" name="maintenance_window" placeholder="Maintenance Window (e.g., Mon:04:00-Mon:05:00)">
+                <label>
+                    <input type="checkbox" name="multi_az"> Enable Multi-AZ
+                </label>
+            </form>
+        </div>
+
+        <!-- S3 Bucket Form -->
+        <div id="s3-form" class="resource-form" style="display: none;">
+            <h2>S3 Configuration</h2>
+            <form id="s3-config">
+                <h3>Basic Configuration</h3>
+                <div class="form-field">
+                    <label for="s3-name">Bucket Name</label>
+                    <input type="text" id="s3-name" name="bucket_name" required>
+                    <div class="help-text">
+                        The name of the bucket. Must be globally unique across all AWS accounts.
+                        Can contain only lowercase letters, numbers, dots (.), and hyphens (-).
+                    </div>
+                </div>
+
+                <select name="acl">
+                    <option value="private">Private</option>
+                    <option value="public-read">Public Read</option>
+                    <option value="public-read-write">Public Read-Write</option>
+                    <option value="authenticated-read">Authenticated Read</option>
+                </select>
+
+                <h3>Versioning & Encryption</h3>
+                <label>
+                    <input type="checkbox" name="versioning"> Enable Versioning
+                </label>
+                <label>
+                    <input type="checkbox" name="encryption"> Enable Server-side Encryption
+                </label>
+                <select name="encryption_type">
+                    <option value="AES256">AES256</option>
+                    <option value="aws:kms">AWS KMS</option>
+                </select>
+                <input type="text" name="kms_master_key_id" placeholder="KMS Key ID (if using KMS)">
+
+                <h3>Lifecycle Rules</h3>
+                <label>
+                    <input type="checkbox" name="enable_lifecycle_rules"> Enable Lifecycle Rules
+                </label>
+                <input type="number" name="transition_days" placeholder="Days until transition to IA">
+                <input type="number" name="expiration_days" placeholder="Days until expiration">
+
+                <h3>Cross-Region Replication</h3>
+                <label>
+                    <input type="checkbox" name="enable_replication"> Enable Replication
+                </label>
+                <input type="text" name="destination_bucket" placeholder="Destination Bucket ARN">
+                <input type="text" name="replication_role" placeholder="IAM Role ARN for Replication">
+            </form>
+        </div>
+    </div>
+
+    <button id="generate">Generate Terraform Configuration</button>
+
+    <div class="output">
+        <pre><code id="terraform-output"></code></pre>
+    </div>
+</div>
+
+<script>
+document.getElementById('resource-type').addEventListener('change', function(e) {
+    document.querySelectorAll('.resource-form').forEach(form => {
+        form.style.display = 'none';
+    });
+    document.getElementById(`${e.target.value}-form`).style.display = 'block';
+});
+
+document.getElementById('generate').addEventListener('click', async function() {
+    const resourceType = document.getElementById('resource-type').value;
+    const form = document.getElementById(`${resourceType}-config`);
+    const formData = new FormData(form);
+    const config = Object.fromEntries(formData);
+
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                resource_type: resourceType,
+                config: config
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            alert(data.error);
+        } else {
+            document.getElementById('terraform-output').textContent = data.config;
+        }
+    } catch (error) {
+        alert('Error generating configuration');
+    }
+});
+</script>
+{% endblock %} 

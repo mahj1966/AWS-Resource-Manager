@@ -1,0 +1,137 @@
+# S3 Bucket Resource
+resource "aws_s3_bucket" "{{ bucket_name }}" {
+  bucket = "{{ bucket_name }}"
+  
+  # ACL (if specified)
+  {% if acl %}
+  acl    = "{{ acl }}"
+  {% endif %}
+
+  # Versioning
+  versioning {
+    enabled = {{ versioning | default(false) | lower }}
+  }
+  
+  # Server-side encryption
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        {% if encryption_type == "aws:kms" %}
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = "{{ kms_master_key_id }}"
+        {% else %}
+        sse_algorithm     = "AES256"
+        {% endif %}
+      }
+    }
+  }
+  
+  # Lifecycle Rules
+  {% if enable_lifecycle_rules %}
+  lifecycle_rule {
+    enabled = true
+    
+    transition {
+      days          = {{ transition_days }}
+      storage_class = "STANDARD_IA"
+    }
+    
+    {% if expiration_days %}
+    expiration {
+      days = {{ expiration_days }}
+    }
+    {% endif %}
+  }
+  {% endif %}
+
+  # Cross-Region Replication
+  {% if enable_replication %}
+  replication_configuration {
+    role = "{{ replication_role }}"
+    
+    rules {
+      status = "Enabled"
+      destination {
+        bucket = "{{ destination_bucket }}"
+        {% if kms_key_id %}
+        encryption_configuration {
+          replica_kms_key_id = "{{ kms_key_id }}"
+        }
+        {% endif %}
+      }
+    }
+  }
+  {% endif %}
+
+  # Object Lock Configuration
+  {% if enable_object_lock %}
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    {% if object_lock_mode %}
+    rule {
+      default_retention {
+        mode = "{{ object_lock_mode }}"
+        days = {{ object_lock_days }}
+      }
+    }
+    {% endif %}
+  }
+  {% endif %}
+
+  # Tags
+  tags = {
+    Name = "{{ bucket_name }}"
+    {% if tags %}
+    {% for key, value in tags.items() %}
+    {{ key }} = "{{ value }}"
+    {% endfor %}
+    {% endif %}
+  }
+}
+
+# Bucket Public Access Block
+resource "aws_s3_bucket_public_access_block" "{{ bucket_name }}" {
+  bucket = aws_s3_bucket.{{ bucket_name }}.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Bucket Policy (if specified)
+{% if bucket_policy %}
+resource "aws_s3_bucket_policy" "{{ bucket_name }}" {
+  bucket = aws_s3_bucket.{{ bucket_name }}.id
+  policy = jsonencode({{ bucket_policy }})
+}
+{% endif %}
+
+# Bucket Logging Configuration
+{% if enable_logging %}
+resource "aws_s3_bucket_logging" "{{ bucket_name }}" {
+  bucket = aws_s3_bucket.{{ bucket_name }}.id
+
+  target_bucket = "{{ logging_bucket }}"
+  target_prefix = "{{ logging_prefix }}"
+}
+{% endif %}
+
+# Outputs
+output "bucket_id" {
+  value = aws_s3_bucket.{{ bucket_name }}.id
+}
+
+output "bucket_arn" {
+  value = aws_s3_bucket.{{ bucket_name }}.arn
+}
+
+output "bucket_domain_name" {
+  value = aws_s3_bucket.{{ bucket_name }}.bucket_domain_name
+}
+
+{% if enable_replication %}
+output "bucket_replication_role_arn" {
+  value = aws_s3_bucket.{{ bucket_name }}.replication_configuration[0].role
+}
+{% endif %} 

@@ -1,0 +1,75 @@
+# RDS Instance Resource
+resource "aws_db_instance" "{{ database_name }}" {
+  # Basic Configuration
+  identifier        = "{{ identifier }}"
+  engine            = "{{ engine }}"
+  engine_version    = "{{ engine_version }}"
+  instance_class    = "{{ instance_class }}"
+  
+  # Database Settings
+  db_name          = "{{ database_name }}"
+  username         = "{{ username }}"
+  password         = "{{ password }}"
+  port             = {{ port | default(3306) }}
+  
+  # Storage Configuration
+  allocated_storage = {{ allocated_storage | default(20) }}
+  storage_type      = "{{ storage_type }}"
+  {% if storage_type == "io1" %}
+  iops             = {{ iops }}
+  {% endif %}
+  
+  # Network & Security
+  db_subnet_group_name   = "{{ db_subnet_group_name }}"
+  vpc_security_group_ids = [{% for sg in vpc_security_group_ids.split(',') %}"{{ sg.strip() }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+  publicly_accessible    = {{ publicly_accessible | default(false) | lower }}
+  
+  # Backup Configuration
+  backup_retention_period = {{ backup_retention_period | default(7) }}
+  {% if backup_window %}
+  backup_window          = "{{ backup_window }}"
+  {% endif %}
+  {% if maintenance_window %}
+  maintenance_window     = "{{ maintenance_window }}"
+  {% endif %}
+  
+  # High Availability
+  multi_az = {{ multi_az | default(false) | lower }}
+  
+  # Performance Insights
+  {% if enable_performance_insights | default(false) %}
+  performance_insights_enabled = true
+  performance_insights_retention_period = {{ performance_insights_retention_period | default(7) }}
+  {% endif %}
+  
+  # Enhanced Monitoring
+  {% if monitoring_interval %}
+  monitoring_interval = {{ monitoring_interval }}
+  monitoring_role_arn = "{{ monitoring_role_arn }}"
+  {% endif %}
+  
+  # Encryption
+  storage_encrypted = true
+  {% if kms_key_id %}
+  kms_key_id       = "{{ kms_key_id }}"
+  {% endif %}
+
+  # Tags
+  tags = {
+    Name = "{{ database_name }}"
+    {% if tags %}
+    {% for key, value in tags.items() %}
+    {{ key }} = "{{ value }}"
+    {% endfor %}
+    {% endif %}
+  }
+}
+
+# Outputs
+output "endpoint" {
+  value = aws_db_instance.{{ database_name }}.endpoint
+}
+
+output "arn" {
+  value = aws_db_instance.{{ database_name }}.arn
+} 
