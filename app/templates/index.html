@@ -443,6 +443,244 @@
         </ul>
     </div>
 
+    <!-- EC2 Additional Help Text -->
+    <div class="help-text" id="help-instance-type">
+        <h4>Instance Type</h4>
+        <p>The compute and memory capacity of your instance.</p>
+        <ul>
+            <li>t3.micro: Good for development and testing</li>
+            <li>t3.small: Suitable for low-traffic applications</li>
+            <li>t3.medium: Balanced for general purpose use</li>
+        </ul>
+        <div class="example">Cost varies by region and instance type</div>
+    </div>
+
+    <div class="help-text" id="help-ami">
+        <h4>AMI ID</h4>
+        <p>Amazon Machine Image to use for the instance.</p>
+        <ul>
+            <li>Amazon Linux 2: AWS-optimized Linux</li>
+            <li>Ubuntu: Popular for development</li>
+            <li>ARM64: For Graviton processors</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-volume-size">
+        <h4>Root Volume Size</h4>
+        <p>Size of the root EBS volume in gigabytes.</p>
+        <ul>
+            <li>Minimum: 8 GB</li>
+            <li>Maximum: 16384 GB</li>
+            <li>Consider OS and application needs</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-iops">
+        <h4>IOPS</h4>
+        <p>Input/Output Operations Per Second for io1/io2 volumes.</p>
+        <ul>
+            <li>Minimum: 100 IOPS</li>
+            <li>Maximum: 64000 IOPS</li>
+            <li>Higher IOPS = Better performance</li>
+        </ul>
+    </div>
+
+    <!-- RDS Additional Help Text -->
+    <div class="help-text" id="help-subnet-group">
+        <h4>DB Subnet Group</h4>
+        <p>Group of subnets where RDS can be placed.</p>
+        <ul>
+            <li>Must span multiple AZs</li>
+            <li>Minimum of two subnets</li>
+            <li>Must be in same VPC</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-security-groups">
+        <h4>Security Groups</h4>
+        <p>VPC security groups to associate with the RDS instance.</p>
+        <ul>
+            <li>Control network access</li>
+            <li>Multiple groups allowed</li>
+            <li>Comma-separated list</li>
+        </ul>
+        <div class="example">Example: sg-123456,sg-789012</div>
+    </div>
+
+    <div class="help-text" id="help-public-access">
+        <h4>Public Access</h4>
+        <p>Controls whether the database is accessible from the internet.</p>
+        <ul>
+            <li>Not recommended for production</li>
+            <li>Requires public subnet</li>
+            <li>Still needs security group rules</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-username">
+        <h4>Master Username</h4>
+        <p>Administrative username for the database.</p>
+        <ul>
+            <li>Must start with a letter</li>
+            <li>1-16 alphanumeric characters</li>
+            <li>Cannot be a reserved word</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-password">
+        <h4>Master Password</h4>
+        <p>Password for the master user account.</p>
+        <ul>
+            <li>Minimum 8 characters</li>
+            <li>Must contain 3 of: uppercase, lowercase, numbers, special characters</li>
+            <li>Cannot contain '/', '@', or '"'</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-backup-retention">
+        <h4>Backup Retention</h4>
+        <p>Number of days to retain automated backups.</p>
+        <ul>
+            <li>0-35 days</li>
+            <li>0 disables backups</li>
+            <li>Affects point-in-time recovery</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-multi-az">
+        <h4>Multi-AZ Deployment</h4>
+        <p>Maintains a synchronous standby replica in a different AZ.</p>
+        <ul>
+            <li>Enhances availability</li>
+            <li>Automatic failover</li>
+            <li>Additional cost</li>
+        </ul>
+    </div>
+
+    <!-- S3 Additional Help Text -->
+    <div class="help-text" id="help-encryption">
+        <h4>Server-side Encryption</h4>
+        <p>Automatically encrypt objects when stored in S3.</p>
+        <ul>
+            <li>Transparent to users</li>
+            <li>No performance impact</li>
+            <li>Additional security layer</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-kms-key">
+        <h4>KMS Key ID</h4>
+        <p>AWS KMS key for server-side encryption.</p>
+        <ul>
+            <li>Can be alias or ARN</li>
+            <li>Must have permissions</li>
+            <li>Additional cost per request</li>
+        </ul>
+        <div class="example">Example: alias/my-key or arn:aws:kms:region:account:key/id</div>
+    </div>
+
+    <!-- RDS Help Text -->
+    <div class="help-text" id="help-engine-version">
+        <h4>Engine Version</h4>
+        <p>The version of the database engine to use.</p>
+        <ul>
+            <li>Choose latest for new deployments</li>
+            <li>Consider compatibility requirements</li>
+            <li>Check AWS RDS version lifecycle</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-instance-class">
+        <h4>Instance Class</h4>
+        <p>The compute and memory capacity of the database instance.</p>
+        <ul>
+            <li>db.t3: Burstable performance</li>
+            <li>db.r5: Memory optimized</li>
+            <li>Consider workload requirements</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-storage">
+        <h4>Allocated Storage</h4>
+        <p>The amount of storage to allocate to the database.</p>
+        <ul>
+            <li>Minimum: 20 GB</li>
+            <li>Maximum: 65536 GB</li>
+            <li>Can be increased later</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-storage-type">
+        <h4>Storage Type</h4>
+        <p>The type of storage to use for the database.</p>
+        <ul>
+            <li>gp2/gp3: General Purpose SSD</li>
+            <li>io1: Provisioned IOPS SSD</li>
+            <li>Choose based on IOPS needs</li>
+        </ul>
+    </div>
+
+    <!-- S3 Help Text -->
+    <div class="help-text" id="help-acl">
+        <h4>Access Control</h4>
+        <p>The canned ACL to apply to the bucket.</p>
+        <ul>
+            <li>private: No public access</li>
+            <li>public-read: Objects can be read</li>
+            <li>authenticated-read: AWS users only</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-versioning">
+        <h4>Versioning</h4>
+        <p>Keep multiple versions of objects in the bucket.</p>
+        <ul>
+            <li>Protects against accidental deletion</li>
+            <li>Preserves old versions</li>
+            <li>Enables rollback capability</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-transition">
+        <h4>IA Transition</h4>
+        <p>Days until objects move to Infrequent Access storage.</p>
+        <ul>
+            <li>Minimum: 30 days</li>
+            <li>Lower storage cost</li>
+            <li>Higher retrieval cost</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-expiration">
+        <h4>Expiration</h4>
+        <p>Days until objects are permanently deleted.</p>
+        <ul>
+            <li>Automatic cleanup</li>
+            <li>Reduces storage costs</li>
+            <li>Cannot be undone</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-destination">
+        <h4>Destination Bucket</h4>
+        <p>The bucket to replicate objects to.</p>
+        <ul>
+            <li>Must be in a different region</li>
+            <li>Format: bucket-name</li>
+            <li>Must already exist</li>
+        </ul>
+    </div>
+
+    <div class="help-text" id="help-replication-role">
+        <h4>IAM Role ARN</h4>
+        <p>The ARN of the IAM role for replication.</p>
+        <ul>
+            <li>Must have proper permissions</li>
+            <li>Format: arn:aws:iam::account:role/name</li>
+        </ul>
+        <div class="example">Example: arn:aws:iam::123456789012:role/s3-replication-role</div>
+    </div>
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
